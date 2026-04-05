@@ -1,12 +1,17 @@
 export default {
   async fetch(request, env) {
-    // 1. Manejo de CORS Preflight
+    // 1. Filtro de Seguridad: Solo permitir peticiones desde tu web
+    const origin = request.headers.get("Origin");
+    if (origin &&!origin.includes("inproshield.pages.dev")) {
+      return new Response("No autorizado", { status: 403 });
+    }
+
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "POST, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, X-API-KEY",
+          "Access-Control-Allow-Headers": "Content-Type, x-goog-api-key",
         }
       });
     }
@@ -15,13 +20,12 @@ export default {
       const body = await request.json();
       const targetUrl = new URL(env.VALORAPP_URL);
       
-      // 2. Llamada a Google Cloud Run con fix de Host header
-      // Importante: Cloud Run rechaza peticiones si el Host no coincide [3, 4]
+      // 2. Llamada a Google Cloud Run con cabecera Host y API Key correcta
       const response = await fetch(targetUrl.toString(), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-KEY": env.VALORAPP_KEY,
+          "x-goog-api-key": env.VALORAPP_KEY, // Cabecera estándar Gemini 2026 
           "Host": targetUrl.hostname 
         },
         body: JSON.stringify(body)
@@ -36,7 +40,7 @@ export default {
         }
       });
     } catch (err) {
-      return new Response(JSON.stringify({ error: "API Proxy Error", msg: err.message }), { status: 500 });
+      return new Response(JSON.stringify({ error: "Proxy Error", details: err.message }), { status: 500 });
     }
   }
 };
