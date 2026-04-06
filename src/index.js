@@ -1,6 +1,6 @@
 export default {
   async fetch(request, env) {
-    // 1. Validar método
+    // Manejo de CORS para inproshield.pages.dev
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
@@ -11,6 +11,7 @@ export default {
       });
     }
 
+    // Solo aceptar POST
     if (request.method !== "POST") {
       return new Response(JSON.stringify({ error: "Método no permitido" }), {
         status: 405,
@@ -22,7 +23,7 @@ export default {
       const propertyData = await request.json();
       const prompt = propertyData.prompt || "Analiza la integridad del sistema.";
 
-      // 2. Obtener API Key (debe estar configurada como secreto)
+      // Obtener API Key desde secreto
       const GEMINI_API_KEY = env.GEMINI_API_KEY;
       if (!GEMINI_API_KEY) {
         return new Response(JSON.stringify({ error: "API Key no configurada" }), {
@@ -31,7 +32,7 @@ export default {
         });
       }
 
-      // 3. Construcción del Prompt con JSON Schema (evita NaN)
+      // Payload con JSON Schema (evita NaN)
       const geminiPayload = {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
@@ -48,7 +49,7 @@ export default {
         }
       };
 
-      // 4. Llamada DIRECTA a Gemini API (NO a Cloud Run)
+      // Llamada directa a Gemini API
       const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`;
       
       const response = await fetch(geminiUrl, {
@@ -59,7 +60,7 @@ export default {
 
       const geminiData = await response.json();
 
-      // 5. Manejo de errores de Gemini
+      // Manejo de errores de Gemini
       if (geminiData.error) {
         return new Response(JSON.stringify({ error: geminiData.error.message }), {
           status: 500,
@@ -67,7 +68,7 @@ export default {
         });
       }
 
-      // 6. Extraer y sanear la respuesta (nunca NaN)
+      // Saneamiento: NUNCA devolver NaN
       let result = {
         integrity_score: 0,
         vulnerability_detected: false,
@@ -88,7 +89,6 @@ export default {
         }
       }
 
-      // 7. Respuesta final
       return new Response(JSON.stringify(result), {
         headers: { 
           "Content-Type": "application/json",
