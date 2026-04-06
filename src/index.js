@@ -1,5 +1,15 @@
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    
+    // Verificar que sea la ruta correcta
+    if (url.pathname !== "/api/valorar") {
+      return new Response(JSON.stringify({ error: "Ruta no válida" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
     // Manejo de CORS para inproshield.pages.dev
     if (request.method === "OPTIONS") {
       return new Response(null, {
@@ -13,9 +23,12 @@ export default {
 
     // Solo aceptar POST
     if (request.method !== "POST") {
-      return new Response(JSON.stringify({ error: "Método no permitido" }), {
+      return new Response(JSON.stringify({ error: "Método no permitido. Use POST." }), {
         status: 405,
-        headers: { "Content-Type": "application/json" }
+        headers: { 
+          "Content-Type": "application/json",
+          "Allow": "POST"
+        }
       });
     }
 
@@ -23,7 +36,7 @@ export default {
       const propertyData = await request.json();
       const prompt = propertyData.prompt || "Analiza la integridad del sistema.";
 
-      // Obtener API Key desde secreto
+      // Usa la API Key desde el secreto
       const GEMINI_API_KEY = env.GEMINI_API_KEY;
       if (!GEMINI_API_KEY) {
         return new Response(JSON.stringify({ error: "API Key no configurada" }), {
