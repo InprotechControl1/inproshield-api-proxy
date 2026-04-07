@@ -12,7 +12,7 @@ var index_default = {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>InproShield | Nodo Maestro v3.8</title>
             <style>
-                body { font-family: 'Segoe UI', sans-serif; background-color: #0a0a0f; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+                body { font-family: 'Segoe UI', sans-serif; background: #0a0a0f; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
                 .container { background: #13121a; padding: 2.5rem; border-radius: 20px; border: 1px solid #2a2740; text-align: center; max-width: 450px; }
                 h1 { margin: 10px 0; font-size: 1.8rem; color: #3b82f6; }
                 .info { background: #0a0a0f; padding: 1rem; border-radius: 12px; font-family: monospace; font-size: 0.85rem; color: #3b82f6; margin-top: 1.5rem; text-align: left; border: 1px solid #1e1c2a; }
@@ -22,11 +22,11 @@ var index_default = {
             <div class="container">
                 <div style="background: #1E3A8A; color: white; padding: 5px 15px; border-radius: 20px; display: inline-block; font-size: 12px;">● ONLINE</div>
                 <h1>Nodo Maestro v3.8</h1>
-                <p>Bypass v1beta activo. Sincronización de modelo corregida.</p>
+                <p>Bypass v1beta sincronizado. Modelo Flash activo.</p>
                 <div class="info">
                     > Engine: Gemini 1.5 Flash [OK]<br>
-                    > Endpoint: v1beta/generateContent [FIX]<br>
-                    > Status: Listo
+                    > Endpoint: v1beta/generateContent [FIXED]<br>
+                    > Status: Listo para Diagnóstico
                 </div>
             </div>
         </body>
@@ -49,11 +49,11 @@ var index_default = {
       try {
         const body = await request.json();
         
-        const promptText = `Analiza estos datos de una inmobiliaria: ${JSON.stringify(body.responses || body)}. 
-        Escribe un análisis profesional corto (4 líneas) en HTML usando <strong> para resaltar las fugas de dinero detectadas y la solución de InproShield. 
-        Sé directo, sin saludos iniciales.`;
+        const promptText = `Eres el consultor de InproShield. Analiza estos datos de una inmobiliaria: ${JSON.stringify(body.responses || body)}. 
+        Escribe un análisis profesional de 4 líneas en HTML (usa <strong>) sobre fugas de dinero y solución profesional. 
+        Sé directo, sin saludos.`;
 
-        // URL CORREGIDA A v1beta
+        // URL CORRECTA PARA GEMINI 1.5 FLASH
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
         
         const res = await fetch(geminiUrl, {
@@ -69,14 +69,14 @@ var index_default = {
         if (data.error) {
           return new Response(JSON.stringify({
             integrity_score: 0,
-            analysis: `<strong>Error de Configuración:</strong> ${data.error.message}`
+            analysis: `<strong>Aviso de Sistema:</strong> ${data.error.message}`
           }), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
         }
 
-        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "El análisis no pudo ser generado en este momento.";
+        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "El análisis no pudo ser generado.";
         
         return new Response(JSON.stringify({
-            integrity_score: 88,
+            integrity_score: 90,
             analysis: aiText
         }), { 
             headers: { 
@@ -86,7 +86,7 @@ var index_default = {
         });
 
       } catch (err) {
-        return new Response(JSON.stringify({ error: "Fallo en el Nodo: " + err.message }), { status: 500, headers: { "Access-Control-Allow-Origin": "*" } });
+        return new Response(JSON.stringify({ error: "Fallo técnico: " + err.message }), { status: 500, headers: { "Access-Control-Allow-Origin": "*" } });
       }
     }
 
