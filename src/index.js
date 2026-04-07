@@ -2,7 +2,7 @@ var index_default = {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // 1. LANDING DE ESTADO (Para verificar versión)
+    // 1. LANDING DE ESTADO (Verificación de Versión)
     if (url.pathname === "/" || url.pathname === "") {
       return new Response(`
         <!DOCTYPE html>
@@ -10,7 +10,7 @@ var index_default = {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>InproShield | Nodo Maestro v3.8</title>
+            <title>InproShield | Nodo Maestro v3.9</title>
             <style>
                 body { font-family: 'Segoe UI', sans-serif; background: #0a0a0f; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
                 .container { background: #13121a; padding: 2.5rem; border-radius: 20px; border: 1px solid #2a2740; text-align: center; max-width: 450px; }
@@ -21,12 +21,12 @@ var index_default = {
         <body>
             <div class="container">
                 <div style="background: #1E3A8A; color: white; padding: 5px 15px; border-radius: 20px; display: inline-block; font-size: 12px;">● ONLINE</div>
-                <h1>Nodo Maestro v3.8</h1>
-                <p>Bypass v1beta sincronizado. Modelo Flash activo.</p>
+                <h1>Nodo Maestro v3.9</h1>
+                <p>Sincronización de Modelo 'Latest' activada.</p>
                 <div class="info">
-                    > Engine: Gemini 1.5 Flash [OK]<br>
+                    > Engine: Gemini 1.5 Flash Latest [OK]<br>
                     > Endpoint: v1beta/generateContent [FIXED]<br>
-                    > Status: Listo para Diagnóstico
+                    > Status: Listo
                 </div>
             </div>
         </body>
@@ -49,12 +49,12 @@ var index_default = {
       try {
         const body = await request.json();
         
-        const promptText = `Eres el consultor de InproShield. Analiza estos datos de una inmobiliaria: ${JSON.stringify(body.responses || body)}. 
-        Escribe un análisis profesional de 4 líneas en HTML (usa <strong>) sobre fugas de dinero y solución profesional. 
-        Sé directo, sin saludos.`;
+        const promptText = `Eres el consultor senior de InproShield. Analiza estos datos inmobiliarios: ${JSON.stringify(body.responses || body)}. 
+        Genera un análisis profesional de 4 líneas en HTML (usa <strong>) sobre fugas de dinero y la solución de InproShield. 
+        Sin saludos, directo al grano.`;
 
-        // URL CORRECTA PARA GEMINI 1.5 FLASH
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
+        // CAMBIO CRÍTICO: SE AGREGA "-latest" AL NOMBRE DEL MODELO
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${env.GEMINI_API_KEY}`;
         
         const res = await fetch(geminiUrl, {
           method: "POST",
@@ -73,10 +73,10 @@ var index_default = {
           }), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
         }
 
-        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "El análisis no pudo ser generado.";
+        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar el veredicto.";
         
         return new Response(JSON.stringify({
-            integrity_score: 90,
+            integrity_score: 95,
             analysis: aiText
         }), { 
             headers: { 
@@ -90,7 +90,7 @@ var index_default = {
       }
     }
 
-    return new Response("No encontrado", { status: 404 });
+    return new Response("Ruta no encontrada", { status: 404 });
   }
 };
 
