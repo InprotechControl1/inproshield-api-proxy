@@ -2,7 +2,7 @@ var index_default = {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // 1. LANDING DE ESTADO
+    // 1. LANDING DE ESTADO (Para verificar versión)
     if (url.pathname === "/" || url.pathname === "") {
       return new Response(`
         <!DOCTYPE html>
@@ -10,7 +10,7 @@ var index_default = {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>InproShield | Nodo Maestro v3.7</title>
+            <title>InproShield | Nodo Maestro v3.8</title>
             <style>
                 body { font-family: 'Segoe UI', sans-serif; background-color: #0a0a0f; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
                 .container { background: #13121a; padding: 2.5rem; border-radius: 20px; border: 1px solid #2a2740; text-align: center; max-width: 450px; }
@@ -21,12 +21,12 @@ var index_default = {
         <body>
             <div class="container">
                 <div style="background: #1E3A8A; color: white; padding: 5px 15px; border-radius: 20px; display: inline-block; font-size: 12px;">● ONLINE</div>
-                <h1>Nodo Maestro v3.7</h1>
-                <p>Modo de Compatibilidad Total activado.</p>
+                <h1>Nodo Maestro v3.8</h1>
+                <p>Bypass v1beta activo. Sincronización de modelo corregida.</p>
                 <div class="info">
-                    > Engine: Gemini 1.5 [OK]<br>
-                    > Fix: responseMimeType Bypass [OK]<br>
-                    > Status: Listo para Diagnóstico
+                    > Engine: Gemini 1.5 Flash [OK]<br>
+                    > Endpoint: v1beta/generateContent [FIX]<br>
+                    > Status: Listo
                 </div>
             </div>
         </body>
@@ -49,12 +49,12 @@ var index_default = {
       try {
         const body = await request.json();
         
-        // PROMPT SIMPLIFICADO (Sin pedir JSON complejo para evitar errores)
-        const promptText = `Eres el consultor de InproShield. Analiza estos datos: ${JSON.stringify(body.responses || body)}. 
-        Escribe un párrafo de 4 líneas en HTML (usa <strong>) sobre fugas de dinero y solución profesional. 
-        Sé directo, sin saludos.`;
+        const promptText = `Analiza estos datos de una inmobiliaria: ${JSON.stringify(body.responses || body)}. 
+        Escribe un análisis profesional corto (4 líneas) en HTML usando <strong> para resaltar las fugas de dinero detectadas y la solución de InproShield. 
+        Sé directo, sin saludos iniciales.`;
 
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
+        // URL CORREGIDA A v1beta
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
         
         const res = await fetch(geminiUrl, {
           method: "POST",
@@ -69,16 +69,14 @@ var index_default = {
         if (data.error) {
           return new Response(JSON.stringify({
             integrity_score: 0,
-            analysis: `<strong>Error de Comunicación:</strong> ${data.error.message}`
+            analysis: `<strong>Error de Configuración:</strong> ${data.error.message}`
           }), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
         }
 
-        // Extraemos el texto puro de la IA
-        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Análisis no disponible.";
+        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "El análisis no pudo ser generado en este momento.";
         
-        // Lo enviamos en el formato que tu web espera
         return new Response(JSON.stringify({
-            integrity_score: 85,
+            integrity_score: 88,
             analysis: aiText
         }), { 
             headers: { 
@@ -88,7 +86,7 @@ var index_default = {
         });
 
       } catch (err) {
-        return new Response(JSON.stringify({ error: "Fallo técnico: " + err.message }), { status: 500, headers: { "Access-Control-Allow-Origin": "*" } });
+        return new Response(JSON.stringify({ error: "Fallo en el Nodo: " + err.message }), { status: 500, headers: { "Access-Control-Allow-Origin": "*" } });
       }
     }
 
