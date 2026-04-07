@@ -2,7 +2,7 @@ var index_default = {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // 1. LANDING DE ESTADO (Verificación de Versión)
+    // 1. LANDING DE ESTADO (Artillería Pesada)
     if (url.pathname === "/" || url.pathname === "") {
       return new Response(`
         <!DOCTYPE html>
@@ -10,23 +10,23 @@ var index_default = {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>InproShield | Nodo Maestro v3.9</title>
+            <title>InproShield | Nodo Maestro v4.0</title>
             <style>
                 body { font-family: 'Segoe UI', sans-serif; background: #0a0a0f; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-                .container { background: #13121a; padding: 2.5rem; border-radius: 20px; border: 1px solid #2a2740; text-align: center; max-width: 450px; }
-                h1 { margin: 10px 0; font-size: 1.8rem; color: #3b82f6; }
-                .info { background: #0a0a0f; padding: 1rem; border-radius: 12px; font-family: monospace; font-size: 0.85rem; color: #3b82f6; margin-top: 1.5rem; text-align: left; border: 1px solid #1e1c2a; }
+                .container { background: #13121a; padding: 2.5rem; border-radius: 20px; border: 1px solid #dc2626; text-align: center; max-width: 450px; box-shadow: 0 0 30px rgba(220, 38, 38, 0.1); }
+                h1 { margin: 10px 0; font-size: 1.8rem; color: #ef4444; }
+                .info { background: #0a0a0f; padding: 1rem; border-radius: 12px; font-family: monospace; font-size: 0.85rem; color: #ef4444; margin-top: 1.5rem; text-align: left; border: 1px solid #450a0a; }
             </style>
         </head>
         <body>
             <div class="container">
-                <div style="background: #1E3A8A; color: white; padding: 5px 15px; border-radius: 20px; display: inline-block; font-size: 12px;">● ONLINE</div>
-                <h1>Nodo Maestro v3.9</h1>
-                <p>Sincronización de Modelo 'Latest' activada.</p>
+                <div style="background: #dc2626; color: white; padding: 5px 15px; border-radius: 20px; display: inline-block; font-size: 12px; font-weight: bold;">● ARTILLERÍA PESADA ACTIVA</div>
+                <h1>Nodo Maestro v4.0</h1>
+                <p>Bypass de alta prioridad. Motor PRO Inmobiliario conectado.</p>
                 <div class="info">
-                    > Engine: Gemini 1.5 Flash Latest [OK]<br>
-                    > Endpoint: v1beta/generateContent [FIXED]<br>
-                    > Status: Listo
+                    > Engine: Gemini 1.5 PRO [MAX POWER]<br>
+                    > Endpoint: v1beta/PRO [CONECTADO]<br>
+                    > Status: Operativo
                 </div>
             </div>
         </body>
@@ -49,12 +49,11 @@ var index_default = {
       try {
         const body = await request.json();
         
-        const promptText = `Eres el consultor senior de InproShield. Analiza estos datos inmobiliarios: ${JSON.stringify(body.responses || body)}. 
-        Genera un análisis profesional de 4 líneas en HTML (usa <strong>) sobre fugas de dinero y la solución de InproShield. 
-        Sin saludos, directo al grano.`;
+        const promptText = `Eres el Director de Estrategia Inmobiliaria de InproShield. Analiza estos datos: ${JSON.stringify(body.responses || body)}. 
+        Genera un diagnóstico contundente de 4 líneas en HTML (usa <strong>). Detecta la fuga de dinero exacta y da la solución técnica. No uses saludos.`;
 
-        // CAMBIO CRÍTICO: SE AGREGA "-latest" AL NOMBRE DEL MODELO
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${env.GEMINI_API_KEY}`;
+        // EL CAMBIO MAESTRO: USAMOS EL MODELO "PRO"
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${env.GEMINI_API_KEY}`;
         
         const res = await fetch(geminiUrl, {
           method: "POST",
@@ -69,14 +68,14 @@ var index_default = {
         if (data.error) {
           return new Response(JSON.stringify({
             integrity_score: 0,
-            analysis: `<strong>Aviso de Sistema:</strong> ${data.error.message}`
+            analysis: `<strong>Error de Motor Pro:</strong> ${data.error.message}`
           }), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
         }
 
-        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar el veredicto.";
+        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "El análisis Pro no pudo completarse.";
         
         return new Response(JSON.stringify({
-            integrity_score: 95,
+            integrity_score: 99,
             analysis: aiText
         }), { 
             headers: { 
@@ -86,7 +85,7 @@ var index_default = {
         });
 
       } catch (err) {
-        return new Response(JSON.stringify({ error: "Fallo técnico: " + err.message }), { status: 500, headers: { "Access-Control-Allow-Origin": "*" } });
+        return new Response(JSON.stringify({ error: "Fallo crítico: " + err.message }), { status: 500, headers: { "Access-Control-Allow-Origin": "*" } });
       }
     }
 
